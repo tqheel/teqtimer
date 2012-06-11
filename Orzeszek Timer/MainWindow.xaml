@@ -1,0 +1,115 @@
+﻿<!--
+	
+Copyright (C) 2010 Chris Dziemborowicz
+
+This file is part of Orzeszek Timer.
+
+Orzeszek Timer is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+Orzeszek Timer is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<Window x:Class="OrzeszekTimer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Orzeszek Timer" Height="150" Width="300" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" StateChanged="Window_StateChanged" Closing="Window_Closing" Closed="Window_Closed" Activated="Window_Activated" Deactivated="Window_Deactivated" MouseUp="Window_MouseUp" KeyUp="Window_KeyUp">
+	<Window.Resources>
+		<ControlTemplate x:Key="ValidTextBoxTemplate" TargetType="{x:Type TextBox}">
+			<Border x:Name="Border" Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="1" Padding="1" SnapsToDevicePixels="True">
+				<ScrollViewer x:Name="PART_ContentHost" HorizontalAlignment="Center" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+			</Border>
+			<ControlTemplate.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter TargetName="Border" Property="Background" Value="#F5F5F5"/>
+				</Trigger>
+				<Trigger Property="IsFocused" Value="True">
+					<Setter TargetName="Border" Property="BorderBrush" Value="#666666"/>
+				</Trigger>
+				<Trigger Property="Validation.HasError" Value="True">
+					<Setter TargetName="Border" Property="Background" Value="#FFDDDD"/>
+				</Trigger>
+			</ControlTemplate.Triggers>
+		</ControlTemplate>
+		<ControlTemplate x:Key="InvalidTextBoxTemplate" TargetType="{x:Type TextBox}">
+			<Border x:Name="Border" Background="#FFDDDD" BorderBrush="#DDDDDD" BorderThickness="1" Padding="1" SnapsToDevicePixels="True">
+				<ScrollViewer x:Name="PART_ContentHost" HorizontalAlignment="Center" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+			</Border>
+			<ControlTemplate.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter TargetName="Border" Property="Background" Value="#F5F5F5"/>
+				</Trigger>
+				<Trigger Property="IsFocused" Value="True">
+					<Setter TargetName="Border" Property="BorderBrush" Value="#666666"/>
+				</Trigger>
+				<Trigger Property="Validation.HasError" Value="True">
+					<Setter TargetName="Border" Property="Background" Value="#FFDDDD"/>
+				</Trigger>
+			</ControlTemplate.Triggers>
+		</ControlTemplate>
+		<ControlTemplate x:Key="FillButton" TargetType="{x:Type Button}">
+			<Border x:Name="Border" Background="#FFDDDD" BorderBrush="#DDDDDD" BorderThickness="1" Padding="1" SnapsToDevicePixels="True">
+				<ContentPresenter x:Name="ContentPresenter" TextBlock.Foreground="#DD0000" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+			<ControlTemplate.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter TargetName="Border" Property="Background" Value="#FFEEEE"/>
+					<Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#DD6666"/>
+				</Trigger>
+				<Trigger Property="IsFocused" Value="True">
+					<Setter TargetName="Border" Property="Background" Value="#FFEEEE"/>
+					<Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#DD6666"/>
+				</Trigger>
+				<Trigger Property="Button.IsPressed" Value="True">
+					<Setter TargetName="Border" Property="Background" Value="#FFEEEE"/>
+					<Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#CC0000"/>
+				</Trigger>
+			</ControlTemplate.Triggers>
+		</ControlTemplate>
+	</Window.Resources>
+	<Grid>
+		<Button x:Name="MainButton" Height="0" Width="0"/>
+		<ProgressBar x:Name="MainProgressBar">
+			<ProgressBar.Template>
+				<ControlTemplate TargetType="{x:Type ProgressBar}">
+					<Grid>
+						<Border Name="PART_Track" Background="#F5F5F5" Margin="0" SnapsToDevicePixels="True"/>
+						<Border Name="PART_Indicator" Background="#666666" HorizontalAlignment="Left" Margin="0" SnapsToDevicePixels="True"/>
+					</Grid>
+				</ControlTemplate>
+			</ProgressBar.Template>
+		</ProgressBar>
+		<TextBox x:Name="MainTextBox" FontSize="16" FontWeight="Bold" Margin="10" Template="{StaticResource ValidTextBoxTemplate}" TextWrapping="Wrap" Validation.ErrorTemplate="{x:Null}" GotFocus="MainTextBox_GotFocus" LostFocus="MainTextBox_LostFocus" KeyUp="MainTextBox_KeyUp">
+			<TextBox.ContextMenu>
+				<ContextMenu x:Name="MainContextMenu">
+					<MenuItem x:Name="NoNotificationMenuItem" Header="No notification" IsCheckable="True" Click="SoundMenuItem_Click"/>
+					<Separator/>
+					<Separator/>
+					<MenuItem Header="Options">
+						<MenuItem x:Name="ScaleInterfaceMenuItem" Header="Scale interface" IsCheckable="True" Click="ScaleInterfaceMenuItem_Click"/>
+						<MenuItem x:Name="ShowTimerInTrayMenuItem" Header="Show in tray" IsCheckable="True" Click="ShowTimerInTrayMenuItem_Click"/>
+						<Separator/>
+						<MenuItem x:Name="LoopNotificationMenuItem" Header="Loop notification sound" IsCheckable="True" Click="LoopNotificationMenuItem_Click"/>
+						<MenuItem x:Name="LoopTimerMenuItem" Header="Loop timer" IsCheckable="True" Click="LoopTimerMenuItem_Click"/>
+						<MenuItem x:Name="CloseOnFinishMenuItem" Header="Close when done" IsCheckable="True" Click="CloseOnFinishMenuItem_Click"/>
+						<Separator/>
+						<MenuItem x:Name="FlashOnFinishMenuItem" Header="Flash taskbar when done" IsCheckable="True" Click="FlashOnFinishMenuItem_Click"/>
+						<MenuItem x:Name="PopupOnFinishMenuItem" Header="Popup when done" IsCheckable="True" Click="PopupOnFinishMenuItem_Click"/>
+						<Separator/>
+						<MenuItem x:Name="RememberTimerOnCloseMenuItem" Header="Remember timer on close" IsCheckable="True"/>
+					</MenuItem>
+				</ContextMenu>
+			</TextBox.ContextMenu>
+		</TextBox>
+		<Button x:Name="StopNotificationButton" FontSize="16" FontWeight="Bold" Margin="10" Template="{StaticResource FillButton}" Visibility="Collapsed" Click="StopNotificationButton_Click">Stop</Button>
+	</Grid>
+</Window>
