@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Orzeszek")]
 [assembly: AssemblyProduct("Orzeszek Timer")]
-[assembly: AssemblyCopyright("Copyright © 2010 Chris Dziemborowicz")]
+[assembly: AssemblyCopyright("Copyright © 2013 Chris Dziemborowicz")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,6 +51,6 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.6.0.0")]
-[assembly: AssemblyFileVersion("1.6.0.0")]
+[assembly: AssemblyVersion("1.9.0.0")]
+[assembly: AssemblyFileVersion("1.9.0.0")]
 [assembly: GuidAttribute("6BC675EF-F8D5-40C8-89FB-0338DAD4B58A")]

@@ -1,5 +1,5 @@
 ﻿//
-// Copyright (C) 2010 Chris Dziemborowicz
+// Copyright (C) 2013 Chris Dziemborowicz
 //
 // This file is part of Orzeszek Timer.
 //
@@ -23,6 +23,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -65,7 +66,10 @@ namespace OrzeszekTimer
 
 			try
 			{
-				foreach (string soundFilePath in Directory.GetFiles("Sounds", "*.wav"))
+                string exePath = Assembly.GetExecutingAssembly().Location;
+                string exeDir = new FileInfo(exePath).DirectoryName;
+                string soundsDir = System.IO.Path.Combine(exeDir, "Sounds");
+				foreach (string soundFilePath in Directory.GetFiles(soundsDir, "*.wav"))
 				{
 					MenuItem soundMenuItem = new MenuItem();
 					soundMenuItem.Header = System.IO.Path.GetFileNameWithoutExtension(soundFilePath);
@@ -82,6 +86,7 @@ namespace OrzeszekTimer
 
 			UpdateSoundMenuItems();
 
+            AlwaysOnTopMenuItem.IsChecked = Settings.Default.AlwaysOnTop;
 			ScaleInterfaceMenuItem.IsChecked = Settings.Default.ScaleInterface;
 			LoopNotificationMenuItem.IsChecked = Settings.Default.LoopNotification;
 			LoopTimerMenuItem.IsChecked = Settings.Default.LoopTimer;
@@ -90,6 +95,8 @@ namespace OrzeszekTimer
 			PopupOnFinishMenuItem.IsChecked = Settings.Default.PopupOnFinish;
 			RememberTimerOnCloseMenuItem.IsChecked = Settings.Default.RememberTimerOnClose;
 			ShowTimerInTrayMenuItem.IsChecked = Settings.Default.ShowTimerInTray;
+
+            Topmost = Settings.Default.AlwaysOnTop;
 
 			if (Settings.Default.LoopTimer)
 			{
@@ -122,72 +129,82 @@ namespace OrzeszekTimer
 				{
 				}
 
-			interopHelper = new WindowInteropHelper(this);
+            string args = (string)Application.Current.Properties["Args"];
+            if (!string.IsNullOrEmpty(args))
+                try
+                {
+                    if (Regex.IsMatch(args, "(^|\\s+)-startMinimized($|\\s+)", RegexOptions.IgnoreCase))
+                    {
+                        args = Regex.Replace(args, "(^|\\s+)-startMinimized($|\\s+)", string.Empty, RegexOptions.IgnoreCase);
+                        if (Settings.Default.ShowTimerInTray)
+                            Hide();
+                        else
+                            WindowState = System.Windows.WindowState.Minimized;
+                    }
+
+                    if (Regex.IsMatch(args, "(^|\\s+)-closeWhenDone($|\\s+)", RegexOptions.IgnoreCase))
+                    {
+                        args = Regex.Replace(args, "(^|\\s+)-closeWhenDone($|\\s+)", string.Empty, RegexOptions.IgnoreCase);
+                        closeOnFinishThisTime = true;
+                    }
+
+                    object o = FromString(args);
+
+                    if (o is DateTime)
+                    {
+                        start = DateTime.Now;
+                        end = (DateTime)o;
+                        notified = false;
+
+                        Settings.Default.LastTimeSpan = TimeSpan.Zero;
+
+                        MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
+                        MainButton.Focus();
+                    }
+                    else if (o is TimeSpan)
+                    {
+                        TimeSpan ts = (TimeSpan)o;
+
+                        start = DateTime.Now;
+                        end = start.Add(ts);
+                        notified = false;
+
+                        Settings.Default.LastTimeSpan = ts;
+
+                        MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
+                        MainButton.Focus();
+                    }
+
+                    StartTimer();
+                }
+                catch (Exception)
+                {
+                    MainTextBox.Template = (ControlTemplate)Resources["InvalidTextBoxTemplate"];
+                }
+            else if (Settings.Default.RememberTimerOnClose && Settings.Default.TimerRunning && Settings.Default.CurrentStart != DateTime.MinValue && Settings.Default.CurrentEnd != DateTime.MinValue && DateTime.Now > Settings.Default.CurrentStart && DateTime.Now < Settings.Default.CurrentEnd)
+            {
+                start = Settings.Default.CurrentStart;
+                end = Settings.Default.CurrentEnd;
+                notified = false;
+
+                MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
+                MainButton.Focus();
+
+                StartTimer();
+            }
+
+            interopHelper = new WindowInteropHelper(this);
 
 			UpdateNotifyIcon();
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			string args = (string)Application.Current.Properties["Args"];
-			if (args != null)
-				try
-				{
-					if (Regex.IsMatch(args, "(^|\\s+)-closeWhenDone($|\\s+)", RegexOptions.IgnoreCase))
-					{
-						args = Regex.Replace(args, "(^|\\s+)-closeWhenDone($|\\s+)", string.Empty, RegexOptions.IgnoreCase);
-						closeOnFinishThisTime = true;
-					}
-
-					object o = FromString(args);
-
-					if (o is DateTime)
-					{
-						start = DateTime.Now;
-						end = (DateTime)o;
-						notified = false;
-
-						Settings.Default.LastTimeSpan = TimeSpan.Zero;
-
-						MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
-						MainButton.Focus();
-					}
-					else if (o is TimeSpan)
-					{
-						TimeSpan ts = (TimeSpan)o;
-
-						start = DateTime.Now;
-						end = start.Add(ts);
-						notified = false;
-
-						Settings.Default.LastTimeSpan = ts;
-
-						MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
-						MainButton.Focus();
-					}
-
-					StartTimer();
-				}
-				catch (Exception)
-				{
-					MainTextBox.Template = (ControlTemplate)Resources["InvalidTextBoxTemplate"];
-				}
-			else if (Settings.Default.RememberTimerOnClose && Settings.Default.TimerRunning && Settings.Default.CurrentStart != DateTime.MinValue && Settings.Default.CurrentEnd != DateTime.MinValue && DateTime.Now > Settings.Default.CurrentStart && DateTime.Now < Settings.Default.CurrentEnd)
-			{
-				start = Settings.Default.CurrentStart;
-				end = Settings.Default.CurrentEnd;
-				notified = false;
-
-				MainTextBox.Template = (ControlTemplate)Resources["ValidTextBoxTemplate"];
-				MainButton.Focus();
-
-				StartTimer();
-			}
-			else
-			{
-				MainTextBox.Text = ToString(Settings.Default.LastTimeSpan.Ticks < 0 ? TimeSpan.Zero : Settings.Default.LastTimeSpan);
-				MainTextBox.Focus();
-			}
+            if (updaterThread == null)
+            {
+                MainTextBox.Text = ToString(Settings.Default.LastTimeSpan.Ticks < 0 ? TimeSpan.Zero : Settings.Default.LastTimeSpan);
+                MainTextBox.Focus();
+            }
 		}
 
 		private void MainTextBox_KeyUp(object sender, KeyEventArgs e)
@@ -254,6 +271,7 @@ namespace OrzeszekTimer
 			else
 				try
 				{
+                    Settings.Default.AlwaysOnTop = AlwaysOnTopMenuItem.IsChecked;
 					Settings.Default.ScaleInterface = ScaleInterfaceMenuItem.IsChecked;
 					Settings.Default.LoopNotification = LoopNotificationMenuItem.IsChecked;
 					Settings.Default.LoopTimer = LoopTimerMenuItem.IsChecked;
@@ -341,8 +359,11 @@ namespace OrzeszekTimer
 						if (!notified)
 							try
 							{
-								notified = true;
-								SoundPlayer sp = new SoundPlayer(System.IO.Path.Combine("Sounds", Settings.Default.AlarmSound));
+                                notified = true;
+                                string exePath = Assembly.GetExecutingAssembly().Location;
+                                string exeDir = new FileInfo(exePath).DirectoryName;
+                                string soundsDir = System.IO.Path.Combine(exeDir, "Sounds");
+								SoundPlayer sp = new SoundPlayer(System.IO.Path.Combine(soundsDir, Settings.Default.AlarmSound));
 
 								if (Settings.Default.CloseOnFinish || closeOnFinishThisTime)
 									sp.PlaySync();
@@ -586,6 +607,12 @@ namespace OrzeszekTimer
 				NoNotificationMenuItem.IsChecked = true;
 			}
 		}
+
+        private void AlwaysOnTopMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.AlwaysOnTop = AlwaysOnTopMenuItem.IsChecked;
+            Topmost = Settings.Default.AlwaysOnTop;
+        }
 
 		private void ScaleInterfaceMenuItem_Click(object sender, RoutedEventArgs e)
 		{

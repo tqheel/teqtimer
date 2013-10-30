@@ -1,5 +1,5 @@
 ﻿//
-// Copyright (C) 2010 Chris Dziemborowicz
+// Copyright (C) 2013 Chris Dziemborowicz
 //
 // This file is part of Orzeszek Timer.
 //
