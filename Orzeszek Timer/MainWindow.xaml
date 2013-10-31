@@ -1,6 +1,6 @@
 ﻿<!--
 	
-Copyright (C) 2010 Chris Dziemborowicz
+Copyright (C) 2013 Chris Dziemborowicz
 
 This file is part of Orzeszek Timer.
 
@@ -94,8 +94,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					<MenuItem x:Name="NoNotificationMenuItem" Header="No notification" IsCheckable="True" Click="SoundMenuItem_Click"/>
 					<Separator/>
 					<Separator/>
-					<MenuItem Header="Options">
-						<MenuItem x:Name="ScaleInterfaceMenuItem" Header="Scale interface" IsCheckable="True" Click="ScaleInterfaceMenuItem_Click"/>
+                    <MenuItem Header="Options">
+                        <MenuItem x:Name="AlwaysOnTopMenuItem" Header="Always on top" IsCheckable="True" Click="AlwaysOnTopMenuItem_Click"/>
+                        <MenuItem x:Name="ScaleInterfaceMenuItem" Header="Scale interface" IsCheckable="True" Click="ScaleInterfaceMenuItem_Click"/>
 						<MenuItem x:Name="ShowTimerInTrayMenuItem" Header="Show in tray" IsCheckable="True" Click="ShowTimerInTrayMenuItem_Click"/>
 						<Separator/>
 						<MenuItem x:Name="LoopNotificationMenuItem" Header="Loop notification sound" IsCheckable="True" Click="LoopNotificationMenuItem_Click"/>
