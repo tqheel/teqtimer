@@ -254,20 +254,5 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
-Orzeszek Timer/bin/Debug/Orzeszek Timer.exe.config
-Orzeszek Timer/bin/Debug/Orzeszek Timer.vshost.exe.config
-Orzeszek Timer/bin/Debug/Orzeszek Timer.vshost.exe.manifest
-Orzeszek Timer/bin/Debug/Sounds/Loud beep.wav
-Orzeszek Timer/bin/Debug/Sounds/Normal beep.wav
-Orzeszek Timer/bin/Debug/Sounds/Quiet beep.wav
-Orzeszek Timer/obj/x86/Debug/App.g.cs
-Orzeszek Timer/obj/x86/Debug/App.g.i.cs
-Orzeszek Timer/obj/x86/Debug/MainWindow.baml
-Orzeszek Timer/obj/x86/Debug/MainWindow.g.cs
-Orzeszek Timer/obj/x86/Debug/MainWindow.g.i.cs
-Orzeszek Timer/obj/x86/Debug/Orzeszek Timer.csproj.FileListAbsolute.txt
-Orzeszek Timer/obj/x86/Debug/Orzeszek Timer.g.resources
-Orzeszek Timer/obj/x86/Debug/Orzeszek Timer_Content.g.cs
-Orzeszek Timer/obj/x86/Debug/Orzeszek Timer_Content.g.i.cs
-Orzeszek Timer/obj/x86/Debug/OrzeszekTimer.Properties.Resources.resources
-Orzeszek Timer/obj/x86/Debug/OrzeszekTimer.Resource.resources
+Orzeszek Timer/bin/
+Orzeszek Timer/obj/
